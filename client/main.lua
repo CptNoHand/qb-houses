@@ -931,9 +931,10 @@ Citizen.CreateThread(function()
                 if hasKey then
                     -- ENTER HOUSE
                     if not inside then
-                        if closesthouse ~= nil then
-                            if #(pos - dist2) < 1.5 then
-                                DrawText3Ds(Config.Houses[closesthouse].coords.enter.x, Config.Houses[closesthouse].coords.enter.y, Config.Houses[closesthouse].coords.enter.z, '~b~/enter~w~ - Enter')
+                        if #(pos - dist2) < 1.5 then
+                            DrawText3Ds(Config.Houses[closesthouse].coords.enter.x, Config.Houses[closesthouse].coords.enter.y, Config.Houses[closesthouse].coords.enter.z, '~b~E~w~ - Enter')
+                            if IsControlJustPressed(0, 38) then -- E
+                                enterOwnedHouse(closesthouse)
                             end
                         end
                     end
