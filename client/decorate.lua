@@ -4,7 +4,7 @@ local MainCamera = nil
 local curPos
 local speeds = {0.05, 0.1, 0.2, 0.4, 0.5}
 local curSpeed = 1
-local cursorEnabled = true
+local cursorEnabled = false
 local SelectedObj = nil
 local SelObjHash = {}
 local SelObjPos = {}
@@ -19,6 +19,7 @@ local previewObj = nil
 
 local function openDecorateUI()
 	SetNuiFocus(true, true)
+	cursorEnabled = true
 	SendNUIMessage({
 		type = "openObjects",
 		furniture = Config.Furniture,
@@ -27,8 +28,8 @@ local function openDecorateUI()
 end
 
 local function closeDecorateUI()
-	cursorEnabled = not cursorEnabled
 	SetNuiFocus(false, false)
+	cursorEnabled = false
 	SendNUIMessage({
 		type = "closeUI",
 	})
@@ -212,103 +213,10 @@ local function CheckMovementInput()
 	SetCamCoord(MainCamera, curPos.x, curPos.y, curPos.z)
 end
 
-local function DrawEntityBoundingBox(entity, color)
-	local model = GetEntityModel(entity)
-    local min, max = GetModelDimensions(model)
-    local rightVector, forwardVector, upVector, position = GetEntityMatrix(entity)
-
-    -- Calculate size
-    local dim =
-	{
-		x = 0.5*(max.x - min.x),
-		y = 0.5*(max.y - min.y),
-		z = 0.5*(max.z - min.z)
-	}
-
-    local FUR =
-    {
-		x = position.x + dim.y*rightVector.x + dim.x*forwardVector.x + dim.z*upVector.x,
-		y = position.y + dim.y*rightVector.y + dim.x*forwardVector.y + dim.z*upVector.y,
-		z = 0
-    }
-
-    local FUR_bool, FUR_z = GetGroundZFor_3dCoord(FUR.x, FUR.y, 1000.0, 0)
-    FUR.z = FUR_z
-    FUR.z = position.z + 2 * dim.z
-
-    local BLL =
-    {
-        x = position.x - dim.y*rightVector.x - dim.x*forwardVector.x - dim.z*upVector.x,
-        y = position.y - dim.y*rightVector.y - dim.x*forwardVector.y - dim.z*upVector.y,
-        z = 0
-    }
-    local BLL_bool, BLL_z = GetGroundZFor_3dCoord(FUR.x, FUR.y, 1000.0, 0)
-    BLL.z = position.z
-
-    -- DEBUG
-    local edge1 = BLL
-    local edge5 = FUR
-
-    local edge2 =
-    {
-        x = edge1.x + 2 * dim.y*rightVector.x,
-        y = edge1.y + 2 * dim.y*rightVector.y,
-        z = edge1.z + 2 * dim.y*rightVector.z
-    }
-
-    local edge3 =
-    {
-        x = edge2.x + 2 * dim.z*upVector.x,
-        y = edge2.y + 2 * dim.z*upVector.y,
-        z = edge2.z + 2 * dim.z*upVector.z
-    }
-
-    local edge4 =
-    {
-        x = edge1.x + 2 * dim.z*upVector.x,
-        y = edge1.y + 2 * dim.z*upVector.y,
-        z = edge1.z + 2 * dim.z*upVector.z
-    }
-
-    local edge6 =
-    {
-        x = edge5.x - 2 * dim.y*rightVector.x,
-        y = edge5.y - 2 * dim.y*rightVector.y,
-        z = edge5.z - 2 * dim.y*rightVector.z
-    }
-
-    local edge7 =
-    {
-        x = edge6.x - 2 * dim.z*upVector.x,
-        y = edge6.y - 2 * dim.z*upVector.y,
-        z = edge6.z - 2 * dim.z*upVector.z
-    }
-
-    local edge8 =
-    {
-        x = edge5.x - 2 * dim.z*upVector.x,
-        y = edge5.y - 2 * dim.z*upVector.y,
-        z = edge5.z - 2 * dim.z*upVector.z
-    }
-
-    DrawLine(edge1.x, edge1.y, edge1.z, edge2.x, edge2.y, edge2.z, color.r, color.g, color.b, color.a)
-    DrawLine(edge1.x, edge1.y, edge1.z, edge4.x, edge4.y, edge4.z, color.r, color.g, color.b, color.a)
-    DrawLine(edge2.x, edge2.y, edge2.z, edge3.x, edge3.y, edge3.z, color.r, color.g, color.b, color.a)
-    DrawLine(edge3.x, edge3.y, edge3.z, edge4.x, edge4.y, edge4.z, color.r, color.g, color.b, color.a)
-    DrawLine(edge5.x, edge5.y, edge5.z, edge6.x, edge6.y, edge6.z, color.r, color.g, color.b, color.a)
-    DrawLine(edge5.x, edge5.y, edge5.z, edge8.x, edge8.y, edge8.z, color.r, color.g, color.b, color.a)
-    DrawLine(edge6.x, edge6.y, edge6.z, edge7.x, edge7.y, edge7.z, color.r, color.g, color.b, color.a)
-    DrawLine(edge7.x, edge7.y, edge7.z, edge8.x, edge8.y, edge8.z, color.r, color.g, color.b, color.a)
-    DrawLine(edge1.x, edge1.y, edge1.z, edge7.x, edge7.y, edge7.z, color.r, color.g, color.b, color.a)
-    DrawLine(edge2.x, edge2.y, edge2.z, edge8.x, edge8.y, edge8.z, color.r, color.g, color.b, color.a)
-    DrawLine(edge3.x, edge3.y, edge3.z, edge5.x, edge5.y, edge5.z, color.r, color.g, color.b, color.a)
-    DrawLine(edge4.x, edge4.y, edge4.z, edge6.x, edge6.y, edge6.z, color.r, color.g, color.b, color.a)
-end
-
 -- Events
 
 RegisterNetEvent('qb-houses:client:decorate', function()
-	Citizen.Wait(500)
+	Wait(500)
 	if inside then
 		if hasKey then
 			if not DecoMode then
@@ -331,13 +239,14 @@ RegisterNUICallback("closedecorations", function(data, cb)
 	end
 	DisableEditMode()
     SetNuiFocus(false, false)
+	cursorEnabled = false
 end)
 
 RegisterNUICallback("deleteSelectedObject", function(data, cb)
 	DeleteObject(SelectedObj)
 	SelectedObj = nil
 	table.remove(ObjectList, SelObjId)
-	Citizen.Wait(100)
+	Wait(100)
 	SaveDecorations()
 	SelObjId = 0
 	peanut = false
@@ -354,7 +263,7 @@ RegisterNUICallback("buySelectedObject", function(data, cb)
     QBCore.Functions.TriggerCallback('qb-houses:server:buyFurniture', function(isSuccess)
         if isSuccess then
             SetNuiFocus(false, false)
-            cursorEnabled = not cursorEnabled
+            cursorEnabled = false
             SaveDecorations()
             SelectedObj = nil
             SelObjId = 0
@@ -397,11 +306,8 @@ RegisterNUICallback('removeObject', function()
 end)
 
 RegisterNUICallback('toggleCursor', function()
-	if cursorEnabled then
-		SetNuiFocus(false, false)
-	end
-
 	cursorEnabled = not cursorEnabled
+	SetNuiFocus(cursorEnabled, cursorEnabled)
 end)
 
 RegisterNUICallback('selectOwnedObject', function(data)
@@ -421,7 +327,7 @@ end)
 
 RegisterNUICallback('editOwnedObject', function(data)
 	SetNuiFocus(false, false)
-	cursorEnabled = not cursorEnabled
+	cursorEnabled = false
 	local objectData = data.objectData
 
 	local ownedObject = GetClosestObjectOfType(objectData.x, objectData.y, objectData.z, 1.5, GetHashKey(objectData.hashname), false, 6, 7)
@@ -449,14 +355,14 @@ end)
 
 RegisterNUICallback("spawnobject", function(data, cb)
 	SetNuiFocus(false, false)
-	cursorEnabled = not cursorEnabled
+	cursorEnabled = false
 	if previewObj then
 		DeleteObject(previewObj)
 	end
 	local modelHash = GetHashKey(tostring(data.object))
 	RequestModel(modelHash)
 	while not HasModelLoaded(modelHash) do
-	    Citizen.Wait(1000)
+	    Wait(1000)
 	end
 	local rotation = GetCamRot(MainCamera, 2)
 	local xVect = 2.5 * math.sin( degToRad( rotation.z ) ) * -1.0
@@ -487,7 +393,7 @@ RegisterNUICallback("chooseobject", function(data, cb)
 			break
 		end
 		count = count + 1
-	    Citizen.Wait(1000)
+	    Wait(1000)
 	end
 
 	-- Make buttons selectable again
@@ -504,9 +410,9 @@ end)
 
 -- Threads
 
-Citizen.CreateThread(function()
+CreateThread(function()
 	while true do
-		Citizen.Wait(7)
+		Wait(7)
 		if DecoMode then
 			DisableAllControlActions(0)
 			EnableControlAction(0, 32, true) -- W
@@ -532,8 +438,8 @@ Citizen.CreateThread(function()
             CheckMovementInput()
 
 			if SelectedObj and peanut then
-				local color = {r = 116, g = 189, b = 252, a = 100}
-				DrawEntityBoundingBox(SelectedObj, color)
+		SetEntityDrawOutline(SelectedObj)
+		SetEntityDrawOutlineColor(116, 189, 252, 100)
                 DrawMarker(21, SelObjPos.x, SelObjPos.y, SelObjPos.z + 1.28, 0.0, 0.0, 0.0, 180.0, 0.0, 0.0, 0.6, 0.6, 0.6, 28, 149, 255, 100, true, true, 2, false, false, false, false)
                 if rotateActive then
                     CheckObjRotationInput()
@@ -550,14 +456,14 @@ Citizen.CreateThread(function()
                 end
 				if IsControlJustReleased(0, 191) then -- Enter
 					SetNuiFocus(true, true)
-					cursorEnabled = not cursorEnabled
+					cursorEnabled = true
 					if not isEdit then
 						SendNUIMessage({
 							type = "buyOption",
 						})
 					else
 						SetNuiFocus(false, false)
-						cursorEnabled = not cursorEnabled
+						cursorEnabled = false
 						SaveDecorations()
 						SelectedObj = nil
 						SelObjId = 0
@@ -569,17 +475,18 @@ Citizen.CreateThread(function()
 				if IsControlJustPressed(0, 166) then -- F5
 					if not cursorEnabled then
 						SetNuiFocus(true, true)
+						cursorEnabled = true
 					end
 				end
-            end
+                        end
 		end
 	end
 end)
 
 -- Out of area
-Citizen.CreateThread(function()
+CreateThread(function()
 	while true do
-		Citizen.Wait(7)
+		Wait(7)
 		if DecoMode then
 			local camPos = GetCamCoord(MainCamera)
 			local dist = #(vector3(camPos.x, camPos.y, camPos.z) - vector3(Config.Houses[closesthouse].coords.enter.x, Config.Houses[closesthouse].coords.enter.y, Config.Houses[closesthouse].coords.enter.z))
