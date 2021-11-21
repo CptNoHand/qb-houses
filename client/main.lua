@@ -1185,9 +1185,11 @@ CreateThread(function()
                             if #(pos - dist2) <= 1.5 then
                                 houseMenu = {
                                     {
-                                        header = "/enter to enter house",
-                                        isMenuHeader = true,
-                                        params = {}
+                                        header = "Enter house",
+                                        params = {
+                                            event = 'qb-houses:client:enterOwnedHouse',
+                                            args = ClosestHouse
+                                        }
                                     }
                                 }
                                 nearLocation = true
