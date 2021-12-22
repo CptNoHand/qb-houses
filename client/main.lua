@@ -110,7 +110,7 @@ local function setViewCam(coords, h, yaw)
 end
 
 local function InstructionButton(ControlButton)
-    N_0xe83a3e3557a56640(ControlButton)
+    ScaleformMovieMethodAddParamPlayerNameString(ControlButton)
 end
 
 local function InstructionButtonMessage(text)
@@ -662,6 +662,22 @@ local function HasHouseKey()
 end
 
 exports('HasHouseKey', HasHouseKey)
+
+local function isNearHouses()
+    local ped = PlayerPedId()
+    local pos = GetEntityCoords(ped)
+
+    if ClosestHouse ~= nil then
+        local dist = #(pos - vector3(Config.Houses[ClosestHouse].coords.enter.x, Config.Houses[ClosestHouse].coords.enter.y, Config.Houses[ClosestHouse].coords.enter.z))
+        if dist <= 1.5 then
+            if HasHouseKey then
+                return true
+            end
+        end
+    end
+end
+
+exports('isNearHouses', isNearHouses)
 
 -- Events
 
