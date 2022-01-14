@@ -2,7 +2,7 @@ ObjectList = {}
 local DecoMode = false
 local MainCamera = nil
 local curPos
-local speeds = {0.05, 0.1, 0.2, 0.4, 0.5}
+local speeds = {0.01, 0.05, 0.1, 0.2, 0.4, 0.5}
 local curSpeed = 1
 local cursorEnabled = false
 local SelectedObj = nil
@@ -102,27 +102,27 @@ local function CheckObjMovementInput()
     local zVect = speeds[curSpeed]
 
     if IsControlPressed( 1, 27) or IsDisabledControlPressed(1, 27) then -- Up Arrow
-    	SelObjPos.x = SelObjPos.x + xVect
+		SelObjPos = GetOffsetFromEntityInWorldCoords(SelectedObj, 0, -yVect, 0)
     end
 
     if IsControlPressed( 1, 173) or IsDisabledControlPressed(1, 173) then -- Down Arrow
-    	SelObjPos.x = SelObjPos.x - xVect
+		SelObjPos = GetOffsetFromEntityInWorldCoords(SelectedObj, 0, yVect, 0)
     end
 
     if IsControlPressed( 1, 174) or IsDisabledControlPressed(1, 174) then -- Left Arrow
-    	SelObjPos.y = SelObjPos.y + yVect
+		SelObjPos = GetOffsetFromEntityInWorldCoords(SelectedObj, xVect, 0, 0)
     end
 
     if IsControlPressed( 1, 175) or IsDisabledControlPressed(1, 175) then -- Right Arrow
-    	SelObjPos.y = SelObjPos.y - yVect
+		SelObjPos = GetOffsetFromEntityInWorldCoords(SelectedObj, -xVect, 0, 0)
     end
 
     if IsControlPressed( 1, 10) or IsDisabledControlPressed(1, 10) then -- Page Up
-    	SelObjPos.z = SelObjPos.z + zVect
+    	SelObjPos = GetOffsetFromEntityInWorldCoords(SelectedObj, 0, 0, zVect)
     end
 
     if IsControlPressed( 1, 11) or IsDisabledControlPressed(1, 11) then -- Page Down
-    	SelObjPos.z = SelObjPos.z - zVect
+    	SelObjPos = GetOffsetFromEntityInWorldCoords(SelectedObj, 0, 0, -zVect)
     end
 
     SetEntityCoords(SelectedObj, SelObjPos.x, SelObjPos.y, SelObjPos.z)
@@ -191,7 +191,7 @@ local function CheckMovementInput()
 		if curSpeed > getTableLength(speeds) then
 			curSpeed = 1
 		end
-		QBCore.Functions.Notify("Speed is ".. tostring(speeds[curSpeed]))
+		QBCore.Functions.Notify(Lang:t("info.speed").. tostring(speeds[curSpeed]))
 	end
 
 	local xVect = speeds[curSpeed] * math.sin( degToRad( rotation.z ) ) * -1.0
@@ -224,10 +224,10 @@ RegisterNetEvent('qb-houses:client:decorate', function()
 				openDecorateUI()
 			end
 		else
-			QBCore.Functions.Notify("You must have the keys to the house!", "error")
+			QBCore.Functions.Notify(Lang:t("error.no_keys"), "error")
 		end
 	else
-		QBCore.Functions.Notify("You are not in a house!", "error")
+		QBCore.Functions.Notify(Lang:t("error.not_in_house"), "error")
 	end
 end)
 
@@ -452,7 +452,7 @@ CreateThread(function()
 				if IsControlJustReleased(0, 19) then -- Left Alt
 					PlaceObjectOnGroundProperly(SelectedObj)
 					local groundPos = GetEntityCoords(SelectedObj)
-					SelObjPos.z = groundPos.z
+					SelObjPos = groundPos
                 end
 				if IsControlJustReleased(0, 191) then -- Enter
 					SetNuiFocus(true, true)
@@ -493,7 +493,7 @@ CreateThread(function()
 			if dist > 50.0 then
 				DisableEditMode()
 				closeDecorateUI()
-				QBCore.Functions.Notify('You have gone out of range', 'error')
+				QBCore.Functions.Notify(Lang:t("error.out_range"), 'error')
 			end
 		end
 	end
