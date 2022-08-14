@@ -166,7 +166,7 @@ local function RegisterStashTarget()
         if isPointInside and not entering and isOwned then
             exports['qb-core']:DrawText(Lang:t("target.open_stash"), 'left')
         else
-            exports['qb-core']:HideText()
+            exports['qb-menu']:HideText()
         end
 
         isInsideStashTarget = isPointInside
@@ -297,10 +297,8 @@ end
 local function DeleteHousesTargets()
     if Config.Targets and next(Config.Targets) then
         for id, target in pairs(Config.Targets) do
-            if not string.find(id, "Exit") then
-                target.zone:destroy()
-                Config.Targets[id] = nil
-            end
+            target.zone:destroy()
+            Config.Targets[id] = nil
         end
     end
 end
