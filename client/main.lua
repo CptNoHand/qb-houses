@@ -869,6 +869,12 @@ local function getDataForHouseTier(house, coords)
         return exports['qb-interior']:CreateV2Modern3(coords)
     elseif Config.Houses[house].tier == 86 then
         return exports['qb-interior']:CreateGTAIVApartment(coords)
+    elseif Config.Houses[house].tier == 87 then
+        return exports['qb-interior']:VineWoodHouse1(coords)
+    elseif Config.Houses[house].tier == 88 then
+        return exports['qb-interior']:VineWoodHouse2(coords)
+    elseif Config.Houses[house].tier == 89 then
+        return exports['qb-interior']:VineWoodHouse3(coords)
     else
         QBCore.Functions.Notify(Lang:t("error.invalid_tier"), 'error')
     end
