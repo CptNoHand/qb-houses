@@ -1,36 +1,38 @@
 fx_version 'cerulean'
 game 'gta5'
-
-description 'QB-Houses'
-version '2.1.0'
+lua54 'yes'
+author 'Kakarot'
+description 'Housing system for players using shells and furniture items to decorate their homes'
+version '2.2.0'
 
 ui_page 'html/index.html'
 
 shared_scripts {
-	'config.lua',
+    'config.lua',
     '@qb-core/shared/locale.lua',
-	'locales/de.lua'
+    'locales/de.lua',
+    'locales/*.lua'
 }
 
 client_scripts {
-	'client/main.lua',
-	'client/decorate.lua',
-	'@PolyZone/client.lua',
-	'@PolyZone/BoxZone.lua',
-	'@PolyZone/CircleZone.lua',
+    'client/main.lua',
+    'client/decorate.lua',
+    '@PolyZone/client.lua',
+    '@PolyZone/BoxZone.lua',
+    '@PolyZone/CircleZone.lua',
 }
 
 server_scripts {
-	'@oxmysql/lib/MySQL.lua',
-	'server/main.lua'
+    '@oxmysql/lib/MySQL.lua',
+    'server/main.lua'
 }
 
 files {
-	'html/index.html',
-	'html/reset.css',
-	'html/style.css',
-	'html/script.js',
-	'html/img/dynasty8-logo.png'
+    'html/index.html',
+    'html/reset.css',
+    'html/style.css',
+    'html/script.js',
+    'html/img/dynasty8-logo.png'
 }
 
 dependencies {
@@ -39,5 +41,3 @@ dependencies {
 --	'qb-clothing',
 	'qb-weathersync'
 }
-
-lua54 'yes'
